@@ -1,21 +1,26 @@
 # anduschain-java-example
 anduschain-java-exmaple
 
-
+## package
 git clone https://github.com/anduschain/anduschain-java-example.git
-
+    
+    import io.anduschain.javasdk.AnduschainDefaultGasProvider;
+    import io.anduschain.javasdk.AnduschainRawTransaction;
+    import io.anduschain.javasdk.AnduschainRawTransactionManager;
+    import io.anduschain.javasdk.AnduschainTransactionEncoder;
+    
 
 ## 1. connection 
-web3 = Web3j.build(new HttpService("HTTP://127.0.0.1:8545"));        //for localhost
-Web3j web3 = Web3j.build(new HttpService("HTTP://127.0.0.1:7545"));  //for ganache
+    web3 = Web3j.build(new HttpService("HTTP://127.0.0.1:8545"));        //for localhost
+    Web3j web3 = Web3j.build(new HttpService("HTTP://127.0.0.1:7545"));  //for ganache
 
-## 2. create wallet 
-make_wallet() { 
-  String walletFileName = WalletUtils.generateFullNewWalletFile(passWord, new File("path/to/file"));
-  ...
-}
+## 2. create wallet : make_wallet()
+    make_wallet() { 
+      String walletFileName = WalletUtils.generateFullNewWalletFile(passWord, new File("path/to/file"));
+      ...
+    }
 
-## 3. transfer (create transaction)
+## 3. transfer (create transaction) : testTransfer() -> testCheckBalance()
 
 ### 1) get nonce
     EthGetTransactionCount ethGetTransactionCount = web3.ethGetTransactionCount(...).sendAsync().get();
@@ -30,7 +35,7 @@ make_wallet() {
     String hexValue = Numeric.toHexString(signedMessage);
     ethCall = web3.ethSendRawTransaction(hexValue).sendAsync().get();
         
-## 4. contract (create transaction)
+## 4. contract (create transaction) : testContract()
 ### 1) contract code 
 you need to pre-compiled contract code.
 
