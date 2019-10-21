@@ -38,7 +38,8 @@ you need to pre-compiled contract code.
     Credentials credentials = WalletUtils.loadCredentials(...)
 
 ### 3) deploy contract
-    SimpleStorage ss = SimpleStorage.deploy(...)  (SimpleStorage is a pre-compiled solidity implementation)
+    //SimpleStorage is a pre-compiled solidity contract code.
+    SimpleStorage ss = SimpleStorage.deploy(...)
 
 ### 4) Get the transaction recipt
     ss.getTransactionReceipt()
