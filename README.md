@@ -18,31 +18,27 @@ make_wallet() {
 ## 3. transfer (create transaction)
 
 ### 1) get nonce
-        EthGetTransactionCount ethGetTransactionCount = web3.ethGetTransactionCount(
-                myAddress, DefaultBlockParameterName.LATEST).sendAsync().get();
-        BigInteger nonce = ethGetTransactionCount.getTransactionCount();
+    EthGetTransactionCount ethGetTransactionCount = web3.ethGetTransactionCount(...).sendAsync().get();
+    BigInteger nonce = ethGetTransactionCount.getTransactionCount();
         
 ### 2) create transaction
-  AnduschainRawTransaction rtm = AnduschainRawTransaction.createEtherTransaction(....)
+    AnduschainRawTransaction rtm = AnduschainRawTransaction.createEtherTransaction(....)
 ### 3) load credentials
-  Credentials credentials = WalletUtils.loadCredentials(...)
+    Credentials credentials = WalletUtils.loadCredentials(...)
 ### 4) sign and send
-  byte[] signedMessage = AnduschainTransactionEncoder.signMessage(rtm, credentials);
-        String hexValue = Numeric.toHexString(signedMessage);
-        ethCall = web3.ethSendRawTransaction(hexValue).sendAsync().get();
-
-        RlpList rl = RlpDecoder.decode(signedMessage);
-
+    byte[] signedMessage = AnduschainTransactionEncoder.signMessage(rtm, credentials);
+    String hexValue = Numeric.toHexString(signedMessage);
+    ethCall = web3.ethSendRawTransaction(hexValue).sendAsync().get();
         
 ## 4. contract (create transaction)
 ### 1) contract code 
 you need to pre-compiled contract code.
 
 ### 2) load credential
-Credentials credentials = WalletUtils.loadCredentials(...)
+    Credentials credentials = WalletUtils.loadCredentials(...)
 
 ### 3) deploy contract
-SimpleStorage ss = SimpleStorage.deploy(...)  (SimpleStorage is a pre-compiled solidity implementation)
+    SimpleStorage ss = SimpleStorage.deploy(...)  (SimpleStorage is a pre-compiled solidity implementation)
 
 ### 4) Get the transaction recipt
-ss.getTransactionReceipt()
+    ss.getTransactionReceipt()
