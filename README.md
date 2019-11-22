@@ -1,14 +1,17 @@
 # anduschain-java-example
 anduschain-java-exmaple
 
-## package
+## Install
 git clone https://github.com/anduschain/anduschain-java-example.git
-    
+
+
+If you use web3j wrapper sdk, need to add library ./lib/io.anduschain.javasdk.jar into your project settings.
+
+
     import io.anduschain.javasdk.AnduschainDefaultGasProvider;
     import io.anduschain.javasdk.AnduschainRawTransaction;
     import io.anduschain.javasdk.AnduschainRawTransactionManager;
-    import io.anduschain.javasdk.AnduschainTransactionEncoder;
-    
+    import io.anduschain.javasdk.AnduschainTransactionEncoder;  
 
 ## 1. connection 
     web3 = Web3j.build(new HttpService("HTTP://127.0.0.1:8545"));        //for localhost
@@ -20,12 +23,11 @@ git clone https://github.com/anduschain/anduschain-java-example.git
       ...
     }
 
-## 3. transfer (create transaction) : testTransfer() -> testCheckBalance()
+## 3. transfer (create transaction) : include function(receiveCoin, transfer)
 
 ### 1) get nonce
     EthGetTransactionCount ethGetTransactionCount = web3.ethGetTransactionCount(...).sendAsync().get();
     BigInteger nonce = ethGetTransactionCount.getTransactionCount();
-        
 ### 2) create transaction
     AnduschainRawTransaction rtm = AnduschainRawTransaction.createEtherTransaction(....)
 ### 3) load credentials
