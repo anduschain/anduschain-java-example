@@ -45,6 +45,18 @@ you need to pre-compiled contract code.
 ### 3) deploy contract
     //SimpleStorage is a pre-compiled solidity contract code.
     SimpleStorage ss = SimpleStorage.deploy(...)
+    
+    or createContractTransaction(...)
+    AnduschainRawTransaction artm = AnduschainRawTransaction.createContractTransaction(
+        new BigInteger("2"),
+        nonce,
+        new BigInteger("23809523805524"),
+        new BigInteger("2100000"),
+        BigInteger.ZERO,
+        getSimpleStorageBinary() // read file (solidity/compiledFile.bin)
+    );
+    
 
 ### 4) Get the transaction recipt
     ss.getTransactionReceipt()
+    or see waitTransactionReceipt(String transactionHash)
