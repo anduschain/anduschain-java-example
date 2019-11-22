@@ -23,7 +23,9 @@ If you use web3j wrapper sdk, need to add library ./lib/io.anduschain.javasdk.ja
       ...
     }
 
-## 3. transfer (create transaction) : include function(receiveCoin, transfer)
+## 3. transfer (create transaction) : include function(receiveCoin, transferCoin)
+receiveCoin : loadCredential from target private key.(defined member)
+transferCoin : loadCredential from my key store.(defined member)
 
 ### 1) get nonce
     EthGetTransactionCount ethGetTransactionCount = web3.ethGetTransactionCount(...).sendAsync().get();
