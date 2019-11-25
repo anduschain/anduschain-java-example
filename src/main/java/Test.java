@@ -1,8 +1,5 @@
-// AnduschainRawTransactionManager, AnduschainDefaultGasProvider use yourSolidty.deploy(...)
-import io.anduschain.javasdk.AnduschainDefaultGasProvider;
-import io.anduschain.javasdk.AnduschainRawTransactionManager;
-import io.anduschain.javasdk.AnduschainRawTransaction;
-import io.anduschain.javasdk.AnduschainTransactionEncoder;
+import io.anduschain.javasdk.*;
+
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
@@ -25,15 +22,25 @@ public class Test {
 
     static Web3j web3;
 
-    //credentials
+    /****************************************************************
+     * dockerNodeAddress : input your docker node address
+     * dockerNodePrivateKey : input your docker node private key
+     * ganache : If you use ganache, input ganache address.
+     ****************************************************************/
+    // for anduschain-docker-control
+    String dockerNodeAddress = "node address";
+    String dockerNodePrivateKey = "private key";
+
+    // for ganache
+    String ganache = "address";
+
+    //credentials : You can use your key-store or use it.
     String keyStorePath = new File("wallet/UTC--2019-10-17T01-50-41.737000000Z--a2ae980a5b4e1cd07b36803e4d978dbd65da3f34.json").getAbsolutePath();
     String passWord = "1111";
-    // address
     String myAddress = "0xa2ae980a5b4e1cd07b36803e4d978dbd65da3f34";
-    String targetAddress = "0xA7E1Fa0b32C1505e77B95AF152C70b7aE304EE38";
-    String ganache = "0xdC98D7489680413b4C664b010Cc6499775BFCC4c";
 
     public static void main(String[] args) {
+        //you can connect anduschain-docker-control node running on localhost
         web3 = Web3j.build(new HttpService("HTTP://127.0.0.1:8545"));
 //        Web3j web3 = Web3j.build(new HttpService("HTTP://127.0.0.1:7545"));  //for ganache
 
@@ -42,13 +49,13 @@ public class Test {
         try {
             tt.getClientVersion();
             tt.getBlockNumber();
-//            tt.make_wallet();
+//            tt.make_wallet("path/to/file");  //make wallet need to define path
             System.out.println("------------------------------------------------------");
             tt.testCheckBalance();
             System.out.println("------------------------------------------------------");
             tt.testReceiveCoin();
             System.out.println("------------------------------------------------------");
-            tt.testTransfer();
+            tt.testSendCoin();
             System.out.println("------------------------------------------------------");
             tt.testCheckBalance();
             System.out.println("------------------------------------------------------");
@@ -61,34 +68,33 @@ public class Test {
         }
     }
 
-    public void getClientVersion() throws IOException {
+    private void getClientVersion() throws IOException {
         Web3ClientVersion clientVersion = web3.web3ClientVersion().send();
         System.out.println("Client version: " + clientVersion.getWeb3ClientVersion());
     }
 
-    public void getBlockNumber() throws IOException {
+    private void getBlockNumber() throws IOException {
         EthBlockNumber blockNumber = web3.ethBlockNumber().send();
         System.out.println("current Block number: " + blockNumber.getBlockNumber());
     }
 
-    public void make_wallet() throws CipherException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
-        String walletFileName = WalletUtils.generateFullNewWalletFile(passWord, new File("path/to/file"));
+    private void make_wallet(String path) throws CipherException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
+        String walletFileName = WalletUtils.generateFullNewWalletFile(passWord, new File(path));
         String[] fetchAddress = walletFileName.split("--");
         String getAddress = fetchAddress[fetchAddress.length - 1].split("\\.")[0];
         System.out.println("Address : " + getAddress);
     }
 
-    public void testReceiveCoin() throws IOException, CipherException, ExecutionException, InterruptedException {
+    private void testReceiveCoin() throws IOException, CipherException, ExecutionException, InterruptedException {
         System.out.println("testReceiveCoin...");
         EthSendTransaction ethCall = null;
 
         //get senders address using private key
-//        Credentials credentials = Credentials.create(/*private key of sender*/);
-        Credentials credentials = Credentials.create("d0e348150013557c83a84f424eac57b77cadb8bf225b4caec5c3bf6dc316f5dc");
-        targetAddress = credentials.getAddress(); // target Address means sender's address in this function.
+        Credentials credentials = Credentials.create(dockerNodePrivateKey);
+        dockerNodeAddress = credentials.getAddress(); // target Address means sender's address in this function.
 
         EthGetTransactionCount ethGetTransactionCount = web3.ethGetTransactionCount(
-                targetAddress, DefaultBlockParameterName.LATEST).sendAsync().get();
+                dockerNodeAddress, DefaultBlockParameterName.LATEST).sendAsync().get();
         BigInteger nonce = ethGetTransactionCount.getTransactionCount();
 
         AnduschainRawTransaction rtm = AnduschainRawTransaction.createEtherTransaction(
@@ -113,7 +119,7 @@ public class Test {
     }
 
 
-    public void testTransfer() throws IOException, CipherException, ExecutionException, InterruptedException {
+    private void testSendCoin() throws IOException, CipherException, ExecutionException, InterruptedException {
         System.out.println("testTransfer...");
         EthSendTransaction ethCall = null;
 
@@ -126,7 +132,7 @@ public class Test {
                 nonce,
                 new BigInteger("23809523805524"),
                 new BigInteger("21000"),
-                targetAddress,
+                dockerNodeAddress,
                 Convert.toWei("1", Convert.Unit.ETHER).toBigInteger()
         );
 
@@ -146,7 +152,7 @@ public class Test {
         waitTransactionReceipt(ethCall.getTransactionHash());
     }
 
-    public void testContract() throws Exception {
+    private void testContract() throws Exception {
         System.out.println("testContract...");
         EthSendTransaction ethCall = null;
 
@@ -177,22 +183,15 @@ public class Test {
             System.out.println("Transaction Hash : " + ethCall.getTransactionHash());
         }
 
-//        SimpleStorage ss = SimpleStorage.deploy(web3,
-//                new AnduschainRawTransactionManager(web3, credentials),
-//                new AnduschainDefaultGasProvider()).send();
-
-//        ss.isValid();
-//        System.out.println("Transaction receipt : " + ss.getTransactionReceipt());
-
         waitTransactionReceipt(ethCall.getTransactionHash());
     }
 
-    public void testCheckBalance() throws IOException {
+    private void testCheckBalance() throws IOException {
         System.out.println("testCheckBlanace...");
         EthGetBalance myBalance = web3.ethGetBalance(myAddress, DefaultBlockParameter.valueOf("latest")).send();
-        EthGetBalance targetBalance = web3.ethGetBalance(targetAddress, DefaultBlockParameter.valueOf("latest")).send();
+        EthGetBalance targetBalance = web3.ethGetBalance(dockerNodeAddress, DefaultBlockParameter.valueOf("latest")).send();
         System.out.println("my balance : " + Convert.fromWei(myBalance.getBalance().toString(), Convert.Unit.ETHER));
-        System.out.println("target balance : " + Convert.fromWei(targetBalance.getBalance().toString(), Convert.Unit.ETHER));
+        System.out.println("docker node balance : " + Convert.fromWei(targetBalance.getBalance().toString(), Convert.Unit.ETHER));
     }
 
     private static String getSimpleStorageBinary() throws Exception {
