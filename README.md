@@ -1,5 +1,5 @@
 # anduschain-java-example
-anduschain-java-exmaple
+anduschain-java-example
 
 ## Install
 git clone https://github.com/anduschain/anduschain-java-example.git
