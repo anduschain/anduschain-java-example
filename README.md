@@ -1,6 +1,11 @@
 # anduschain-java-example
 anduschain-java-example
 
+## Requirements
+Installation is required to run andsuschain-java-example.
+
+See anduschain-docker-control(https://github.com/anduschain/anduschain-docker-control)
+
 ## Install
 git clone https://github.com/anduschain/anduschain-java-example.git
 
