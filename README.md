@@ -28,7 +28,7 @@ If you use web3j wrapper sdk, need to add library ./lib/io.anduschain.javasdk.ja
       ...
     }
 
-## 3. transfer (create transaction) : include function(receiveCoin, transferCoin)
+## 3. transfer (create transaction) : include function(receiveCoin, sendCoin)
 receiveCoin : loadCredential from target private key.(defined member)
 
 transferCoin : loadCredential from my key store.(defined member)
@@ -45,7 +45,7 @@ transferCoin : loadCredential from my key store.(defined member)
     String hexValue = Numeric.toHexString(signedMessage);
     ethCall = web3.ethSendRawTransaction(hexValue).sendAsync().get();
         
-## 4. contract (create transaction) : testContract()
+## 4. contract (create transaction) : sendContract()
 ### 1) contract code 
 you need to pre-compiled contract code.
 
@@ -58,7 +58,7 @@ you need to pre-compiled contract code.
     
     or createContractTransaction(...)
     AnduschainRawTransaction artm = AnduschainRawTransaction.createContractTransaction(
-        new BigInteger("2"),
+        BigInteger.ZERO, //transaction type only allowed BigInteger.ZERO
         nonce,
         new BigInteger("23809523805524"),
         new BigInteger("2100000"),
