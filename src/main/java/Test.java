@@ -26,6 +26,8 @@ public class Test {
     static Web3j web3j;
     static Admin adminWeb3j;
 
+    static BigInteger sNonce;
+
     /****************************************************************
      * dockerNodeAddress : input your docker node address
      * dockerNodePrivateKey : input your docker node private key
@@ -110,26 +112,32 @@ public class Test {
                 dockerNodeAddress, DefaultBlockParameterName.LATEST).sendAsync().get();
         BigInteger nonce = ethGetTransactionCount.getTransactionCount();
 
+        sNonce = nonce;
+        System.out.println("nonce : " + sNonce);
         // create transaction with coinbase.
         PersonalUnlockAccount personalUnlockAccount = adminWeb3j.personalUnlockAccount(dockerNodeAddress,"11111").send();
         if (personalUnlockAccount.hasError()) {
             System.out.println("Can not unlock coinbase : " + personalUnlockAccount.getError().getMessage());
         } else {
             if (personalUnlockAccount.accountUnlocked()) {
-                Transaction tm = Transaction.createEtherTransaction(
-                        dockerNodeAddress,
-                        nonce,
-                        new BigInteger("23809523805524"), // Gas price must greater than 23809523805524
-                        new BigInteger("21000"),
-                        myAddress,
-                        Convert.toWei("5", Convert.Unit.ETHER).toBigInteger()
-                );
-                ethCall = adminWeb3j.ethSendTransaction(tm).send();
-                if (ethCall.hasError()) {
-                    System.out.println(ethCall.getError().getMessage());
-                } else {
-                    System.out.println("Transaction Hash : " + ethCall.getTransactionHash());
-                    waitTransactionReceipt(ethCall.getTransactionHash());
+                for (int i = 0; i < 1; i++) {
+                    Transaction tm = Transaction.createEtherTransaction(
+                            dockerNodeAddress,
+                            sNonce,
+                            new BigInteger("23809523805524"), // Gas price must greater than 23809523805524
+                            new BigInteger("21000"),
+                            myAddress,
+                            Convert.toWei("5", Convert.Unit.ETHER).toBigInteger()
+                    );
+                    ethCall = adminWeb3j.ethSendTransaction(tm).send();
+                    if (ethCall.hasError()) {
+                        System.out.println(ethCall.getError().getMessage());
+                    } else {
+                        System.out.println("Transaction Hash : " + ethCall.getTransactionHash());
+//                    waitTransactionReceipt(ethCall.getTransactionHash());
+                    }
+                    sNonce = sNonce.add(BigInteger.ONE);
+                    System.out.println("nonce : " + sNonce);
                 }
             }
         }
@@ -162,27 +170,33 @@ public class Test {
         System.out.println("testTransfer...");
         EthSendTransaction ethCall = null;
 
-        AnduschainRawTransaction rtm = AnduschainRawTransaction.createEtherTransaction(
-                TRANSACTION_TYPE_GENERAL,
-                getNonce(myAddress),
-                new BigInteger("23809523805524"),
-                new BigInteger("21000"),
-                dockerNodeAddress,
-                Convert.toWei("1", Convert.Unit.ETHER).toBigInteger()
-        );
+        sNonce = getNonce(myAddress);
+        for ( int i = 0; i < 1; i++) {
+            AnduschainRawTransaction rtm = AnduschainRawTransaction.createEtherTransaction(
+                    TRANSACTION_TYPE_GENERAL,
+                    sNonce,
+                    new BigInteger("23809523805524"),
+                    new BigInteger("21000"),
+                    dockerNodeAddress,
+                    Convert.toWei("1", Convert.Unit.ETHER).toBigInteger()
+            );
 
-        Credentials credentials = WalletUtils.loadCredentials(
-                passWord,
-                keyStorePath);
+            Credentials credentials = WalletUtils.loadCredentials(
+                    passWord,
+                    keyStorePath);
 
-        ethCall = web3j.ethSendRawTransaction(getHexFromSignedMessage(rtm, credentials)).sendAsync().get();
+            ethCall = web3j.ethSendRawTransaction(getHexFromSignedMessage(rtm, credentials)).sendAsync().get();
 
-        if (ethCall.hasError()) {
-            System.out.println(ethCall.getError().getMessage());
-        } else {
-            System.out.println("Transaction Hash : " + ethCall.getTransactionHash());
-            waitTransactionReceipt(ethCall.getTransactionHash());
+            if (ethCall.hasError()) {
+                System.out.println(ethCall.getError().getMessage());
+            } else {
+                System.out.println("Transaction Hash : " + ethCall.getTransactionHash());
+//            waitTransactionReceipt(ethCall.getTransactionHash());
+            }
+            sNonce = sNonce.add(BigInteger.ONE);
+            System.out.println("nonce : " + sNonce);
         }
+
     }
 
     private void sendContract() throws Exception {
@@ -193,23 +207,29 @@ public class Test {
                 passWord,
                 keyStorePath);
 
-        AnduschainRawTransaction artm = AnduschainRawTransaction.createContractTransaction(
-                TRANSACTION_TYPE_GENERAL,
-                getNonce(myAddress),
-                new BigInteger("23809523805524"),
-                new BigInteger("2100000"),
-                BigInteger.ZERO,
-                getSimpleStorageBinary()
-        );
+        sNonce = getNonce(myAddress);
+        for ( int i = 0; i < 1; i++) {
+            AnduschainRawTransaction artm = AnduschainRawTransaction.createContractTransaction(
+                    TRANSACTION_TYPE_GENERAL,
+                    sNonce,
+                    new BigInteger("23809523805524"),
+                    new BigInteger("2100000"),
+                    BigInteger.ZERO,
+                    getSimpleStorageBinary()
+            );
 
-        ethCall = web3j.ethSendRawTransaction(getHexFromSignedMessage(artm, credentials)).sendAsync().get();
+            ethCall = web3j.ethSendRawTransaction(getHexFromSignedMessage(artm, credentials)).sendAsync().get();
 
-        if (ethCall.hasError()) {
-            System.out.println(ethCall.getError().getMessage());
-        } else {
-            System.out.println("Transaction Hash : " + ethCall.getTransactionHash());
-            waitTransactionReceipt(ethCall.getTransactionHash());
+            if (ethCall.hasError()) {
+                System.out.println(ethCall.getError().getMessage());
+            } else {
+                System.out.println("Transaction Hash : " + ethCall.getTransactionHash());
+//            waitTransactionReceipt(ethCall.getTransactionHash());
+            }
+            sNonce = sNonce.add(BigInteger.ONE);
+            System.out.println("nonce : " + sNonce);
         }
+
     }
 
     private String getHexFromSignedMessage(AnduschainRawTransaction rtm, Credentials cre) {
